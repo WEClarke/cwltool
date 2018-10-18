@@ -291,6 +291,7 @@ class JobBase(with_metaclass(ABCMeta, HasReqsHints)):
             builder = getattr(self, "builder", None)  # type: Builder
             if builder is not None:
                 job_script_contents = builder.build_job_script(commands)
+            tmp_job_dir=tempfile.mkdtemp(prefix=getdefault(runtimeContext.tmp_outdir_prefix, DEFAULT_TMP_PREFIX))
             rcode = _job_popen(
                 commands,
                 stdin_path=stdin_path,
@@ -298,7 +299,7 @@ class JobBase(with_metaclass(ABCMeta, HasReqsHints)):
                 stderr_path=stderr_path,
                 env=env,
                 cwd=self.outdir,
-                job_dir=tempfile.mkdtemp(prefix=getdefault(runtimeContext.tmp_outdir_prefix, DEFAULT_TMP_PREFIX)),
+                job_dir=tmp_job_dir,
                 job_script_contents=job_script_contents,
                 timelimit=self.timelimit,
                 name=self.name
@@ -384,6 +385,8 @@ class JobBase(with_metaclass(ABCMeta, HasReqsHints)):
         if runtimeContext.rm_tmpdir:
             _logger.debug(u"[job %s] Removing temporary directory %s", self.name, self.tmpdir)
             shutil.rmtree(self.tmpdir, True)
+            _logger.debug(u"[job %s] Removing temporary job directory %s", self.name, tmp_job_dir)
+            shutil.rmtree(tmp_job_dir, True)
 
 
 class CommandLineJob(JobBase):
