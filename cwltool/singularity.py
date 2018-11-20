@@ -281,7 +281,7 @@ class SingularityCommandLineJob(ContainerCommandLineJob):
                 secret_store=runtimeContext.secret_store)
 
         runtime.append(u"--home")
-        runtime.append("%s" % (docker_windows_path_adjust(self.builder.outdir)))
+        runtime.append("%s" % docker_windows_path_adjust(os.path.realpath(self.outdir)))
         runtime.append(u"--pwd")
         runtime.append("%s" % (docker_windows_path_adjust(self.builder.outdir)))
 
